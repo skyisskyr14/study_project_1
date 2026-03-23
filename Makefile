@@ -1,10 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 CORE_SRC = src/candidate.c src/common.c src/db.c src/log.c src/mysql_stub.c src/stats.c src/ui.c src/user.c src/vote.c
-APP_SRC = $(CORE_SRC) src/main.c
 SERVER_SRC = $(CORE_SRC) src/server.c
 CLIENT_SRC = src/client.c
-BIN = voting_system
 SERVER_BIN = voting_server
 CLIENT_BIN = voting_client
 
@@ -45,10 +43,7 @@ else
 $(info [build] 使用真实 MySQL/MariaDB 库编译)
 endif
 
-all: $(BIN) $(SERVER_BIN) $(CLIENT_BIN)
-
-$(BIN): $(APP_SRC)
-	$(CC) $(CFLAGS) $(MYSQL_CFLAGS) -o $@ $^ $(MYSQL_LIBS)
+all: $(SERVER_BIN) $(CLIENT_BIN)
 
 $(SERVER_BIN): $(SERVER_SRC)
 	$(CC) $(CFLAGS) $(MYSQL_CFLAGS) -o $@ $^ $(MYSQL_LIBS)
@@ -57,6 +52,6 @@ $(CLIENT_BIN): $(CLIENT_SRC)
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
-	rm -f $(BIN) $(SERVER_BIN) $(CLIENT_BIN)
+	rm -f $(SERVER_BIN) $(CLIENT_BIN)
 
 .PHONY: all clean
