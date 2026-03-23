@@ -8,51 +8,23 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "ui.h"
 
 #define SERVER_PORT 9090
-#define BUFFER_SIZE 1024
 
-static int send_text(int fd, const char *text) {
-    size_t len = strlen(text);
-    return send(fd, text, len, 0) == (ssize_t)len;
-}
-
-static void handle_client(int client_fd, const char *client_ip) {
-    char buffer[BUFFER_SIZE];
-    ssize_t n;
-
-    printf("[server] client connected: %s\n", client_ip);
-    send_text(client_fd,
-              "欢迎连接投票服务端。\n"
-              "可用命令: HELP / PING / QUIT\n");
-
-    while ((n = recv(client_fd, buffer, sizeof(buffer) - 1, 0)) > 0) {
-        buffer[n] = '\0';
-
-        char *newline = strchr(buffer, '\n');
-        if (newline) *newline = '\0';
-
-        if (strcmp(buffer, "PING") == 0) {
-            send_text(client_fd, "PONG\n");
-        } else if (strcmp(buffer, "HELP") == 0) {
-            send_text(client_fd,
-                      "当前为基础 C/S 连接框架。\n"
-                      "后续可在此协议上扩展登录、拉取候选、投票等命令。\n");
-        } else if (strcmp(buffer, "QUIT") == 0) {
-            send_text(client_fd, "BYE\n");
-            break;
-        } else if (strlen(buffer) == 0) {
-            continue;
-        } else {
-            send_text(client_fd, "未知命令，输入 HELP 查看可用命令。\n");
-        }
-    }
-
-    if (n < 0) {
-        fprintf(stderr, "[server] recv error: %s\n", strerror(errno));
+static void run_session_on_socket(int client_fd) {
+    if (dup2(client_fd, STDIN_FILENO) < 0 ||
+        dup2(client_fd, STDOUT_FILENO) < 0 ||
+        dup2(client_fd, STDERR_FILENO) < 0) {
+        fprintf(stderr, "dup2 失败: %s\n", strerror(errno));
+        return;
     }
     close(client_fd);
-    printf("[server] client disconnected: %s\n", client_ip);
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+
+    run_app();
 }
 
 int main(void) {
@@ -77,14 +49,16 @@ int main(void) {
         return 1;
     }
 
-    if (listen(server_fd, 8) < 0) {
+    if (listen(server_fd, 16) < 0) {
         fprintf(stderr, "listen 失败: %s\n", strerror(errno));
         close(server_fd);
         return 1;
     }
 
     signal(SIGPIPE, SIG_IGN);
+    signal(SIGCHLD, SIG_IGN);
     printf("投票服务端已启动: 0.0.0.0:%d\n", SERVER_PORT);
+    fflush(stdout);
 
     while (1) {
         struct sockaddr_in client_addr;
@@ -95,9 +69,20 @@ int main(void) {
             continue;
         }
 
-        char client_ip[INET_ADDRSTRLEN] = {0};
-        inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
-        handle_client(client_fd, client_ip);
+        pid_t pid = fork();
+        if (pid < 0) {
+            fprintf(stderr, "fork 失败: %s\n", strerror(errno));
+            close(client_fd);
+            continue;
+        }
+
+        if (pid == 0) {
+            close(server_fd);
+            run_session_on_socket(client_fd);
+            return 0;
+        }
+
+        close(client_fd);
     }
 
     close(server_fd);

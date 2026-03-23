@@ -1,7 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
-APP_SRC = src/candidate.c src/common.c src/db.c src/log.c src/main.c src/mysql_stub.c src/stats.c src/ui.c src/user.c src/vote.c
-SERVER_SRC = src/server.c
+CORE_SRC = src/candidate.c src/common.c src/db.c src/log.c src/mysql_stub.c src/stats.c src/ui.c src/user.c src/vote.c
+APP_SRC = $(CORE_SRC) src/main.c
+SERVER_SRC = $(CORE_SRC) src/server.c
 CLIENT_SRC = src/client.c
 BIN = voting_system
 SERVER_BIN = voting_server
@@ -26,7 +27,7 @@ $(BIN): $(APP_SRC)
 	$(CC) $(CFLAGS) $(MYSQL_CFLAGS) -o $@ $^ $(MYSQL_LIBS)
 
 $(SERVER_BIN): $(SERVER_SRC)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) $(MYSQL_CFLAGS) -o $@ $^ $(MYSQL_LIBS)
 
 $(CLIENT_BIN): $(CLIENT_SRC)
 	$(CC) $(CFLAGS) -o $@ $^

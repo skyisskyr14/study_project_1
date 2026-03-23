@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -36,36 +37,60 @@ int main(int argc, char *argv[]) {
     }
 
     printf("已连接到服务端 %s:%d\n", server_ip, SERVER_PORT);
-    printf("输入命令并回车（HELP/PING/QUIT）:\n");
+    fflush(stdout);
 
-    char send_buf[BUFFER_SIZE];
-    char recv_buf[BUFFER_SIZE];
+    while (1) {
+        fd_set readfds;
+        FD_ZERO(&readfds);
+        FD_SET(STDIN_FILENO, &readfds);
+        FD_SET(sockfd, &readfds);
 
-    ssize_t n = recv(sockfd, recv_buf, sizeof(recv_buf) - 1, 0);
-    if (n > 0) {
-        recv_buf[n] = '\0';
-        printf("%s", recv_buf);
-    }
-
-    while (fgets(send_buf, sizeof(send_buf), stdin)) {
-        if (send(sockfd, send_buf, strlen(send_buf), 0) < 0) {
-            fprintf(stderr, "发送失败: %s\n", strerror(errno));
+        int max_fd = (sockfd > STDIN_FILENO) ? sockfd : STDIN_FILENO;
+        if (select(max_fd + 1, &readfds, NULL, NULL, NULL) < 0) {
+            if (errno == EINTR) continue;
+            fprintf(stderr, "select 失败: %s\n", strerror(errno));
             break;
         }
 
-        n = recv(sockfd, recv_buf, sizeof(recv_buf) - 1, 0);
-        if (n <= 0) {
-            printf("服务端已断开连接。\n");
-            break;
+        if (FD_ISSET(STDIN_FILENO, &readfds)) {
+            char inbuf[BUFFER_SIZE];
+            ssize_t n = read(STDIN_FILENO, inbuf, sizeof(inbuf));
+            if (n <= 0) {
+                shutdown(sockfd, SHUT_WR);
+            } else {
+                ssize_t sent = 0;
+                while (sent < n) {
+                    ssize_t m = send(sockfd, inbuf + sent, (size_t)(n - sent), 0);
+                    if (m <= 0) {
+                        fprintf(stderr, "发送失败: %s\n", strerror(errno));
+                        close(sockfd);
+                        return 1;
+                    }
+                    sent += m;
+                }
+            }
         }
-        recv_buf[n] = '\0';
-        printf("%s", recv_buf);
 
-        if (strncmp(send_buf, "QUIT", 4) == 0) {
-            break;
+        if (FD_ISSET(sockfd, &readfds)) {
+            char outbuf[BUFFER_SIZE];
+            ssize_t n = recv(sockfd, outbuf, sizeof(outbuf), 0);
+            if (n <= 0) {
+                break;
+            }
+            ssize_t written = 0;
+            while (written < n) {
+                ssize_t m = write(STDOUT_FILENO, outbuf + written, (size_t)(n - written));
+                if (m <= 0) {
+                    fprintf(stderr, "输出失败: %s\n", strerror(errno));
+                    close(sockfd);
+                    return 1;
+                }
+                written += m;
+            }
         }
     }
 
     close(sockfd);
+    printf("\n连接已关闭。\n");
     return 0;
 }
