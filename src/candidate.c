@@ -63,11 +63,17 @@ int candidate_update(MYSQL *conn, const char *operator_name) {
     return 1;
 }
 
-int candidate_list(MYSQL *conn, const char *order_field) {
-    char sql[256];
+int candidate_list(MYSQL *conn, const char *order_field, const char *category_filter) {
+    char sql[512];
     const char *order = (order_field && strcmp(order_field, "vote_count") == 0) ? "vote_count DESC" : "name ASC";
-    snprintf(sql, sizeof(sql),
-             "SELECT id,name,category,bio,vote_count FROM candidates ORDER BY %s", order);
+    if (category_filter && category_filter[0] != '\0') {
+        snprintf(sql, sizeof(sql),
+                 "SELECT id,name,category,bio,vote_count FROM candidates WHERE category='%s' ORDER BY %s",
+                 category_filter, order);
+    } else {
+        snprintf(sql, sizeof(sql),
+                 "SELECT id,name,category,bio,vote_count FROM candidates ORDER BY %s", order);
+    }
 
     if (mysql_query(conn, sql) != 0) {
         return 0;
