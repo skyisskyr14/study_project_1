@@ -1,7 +1,7 @@
 #ifndef CANDIDATE_H
 #define CANDIDATE_H
 
-#include <mysql/mysql.h>
+#include "mysql_compat.h"
 
 /* 新增候选人 */
 int candidate_add(MYSQL *conn, const char *operator_name);

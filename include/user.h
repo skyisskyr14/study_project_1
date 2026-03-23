@@ -1,7 +1,7 @@
 #ifndef USER_H
 #define USER_H
 
-#include <mysql/mysql.h>
+#include "mysql_compat.h"
 #include "models.h"
 
 /* 用户注册 */

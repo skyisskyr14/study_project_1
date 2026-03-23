@@ -1,7 +1,7 @@
 #ifndef VOTE_H
 #define VOTE_H
 
-#include <mysql/mysql.h>
+#include "mysql_compat.h"
 #include "models.h"
 
 /* 执行投票流程（含权限和防刷校验） */

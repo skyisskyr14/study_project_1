@@ -1,7 +1,7 @@
 #ifndef DB_H
 #define DB_H
 
-#include <mysql/mysql.h>
+#include "mysql_compat.h"
 
 /* 数据库配置结构体 */
 typedef struct {

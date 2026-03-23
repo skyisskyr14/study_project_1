@@ -4,7 +4,7 @@
 - Linux / macOS / Windows
 - GCC (支持 C11)
 - MySQL Server 8+
-- MySQL C Client 开发库（`mysql_config` 可用）
+- **推荐**安装 MySQL C Client 开发库（含 `mysql/mysql.h`）
 
 ## 2. 初始化数据库
 ### Linux / macOS
@@ -25,6 +25,10 @@ mysql -u root -p --default-character-set=utf8mb4 < sql/seed.sql
 ```bash
 make
 ```
+
+> 说明：
+> - 若检测到 MySQL 开发库，编译为真实 MySQL 模式；
+> - 若未检测到，将自动进入 **stub 模式**（可编译、可展示终端交互，但无法连接数据库）。
 
 ## 4. 运行
 ```bash

@@ -1,7 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <mysql/mysql.h>
+#include "mysql_compat.h"
 #include "models.h"
 
 #define APP_NAME "Terminal Voting System"

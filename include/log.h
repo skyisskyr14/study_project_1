@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include <mysql/mysql.h>
+#include "mysql_compat.h"
 
 /* 记录系统日志 */
 int log_action(MYSQL *conn, const char *operator_name, const char *action_type, const char *action_result);

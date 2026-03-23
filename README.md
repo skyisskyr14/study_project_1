@@ -22,4 +22,8 @@
    ./voting_system
    ```
 
+## 编译模式说明
+- 检测到 MySQL 开发库（`mysql/mysql.h` + client lib）时：使用真实 MySQL 模式。
+- 未检测到时：自动回退到 stub 模式，程序可编译但会在启动时提示数据库不可用。
+
 更多细节见 `docs/` 目录。

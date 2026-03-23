@@ -8,6 +8,13 @@ MYSQL *db_connect(const DbConfig *cfg) {
         return NULL;
     }
 
+#ifdef MYSQL_STUB
+    fprintf(stderr, "[DB] 当前为 MySQL stub 模式：未检测到 mysql/mysql.h 或客户端库。\n");
+    fprintf(stderr, "[DB] 请安装 MySQL 开发库后重新编译，或继续用于界面演示。\n");
+    mysql_close(conn);
+    return NULL;
+#endif
+
     if (!mysql_real_connect(conn, cfg->host, cfg->user, cfg->password,
                             cfg->database, cfg->port, NULL, 0)) {
         fprintf(stderr, "[DB] connect failed: %s\n", mysql_error(conn));
