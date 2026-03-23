@@ -11,6 +11,10 @@
 #elif defined(__has_include)
 #  if __has_include(<mysql/mysql.h>)
 #    include <mysql/mysql.h>
+#  elif __has_include(<mariadb/mysql.h>)
+#    include <mariadb/mysql.h>
+#  elif __has_include(<mysql.h>)
+#    include <mysql.h>
 #  else
 #    define MYSQL_STUB 1
 #  endif
