@@ -25,6 +25,11 @@ MYSQL_CFLAGS := $(shell command -v pkg-config >/dev/null 2>&1 && pkg-config --cf
 MYSQL_LIBS := $(shell command -v pkg-config >/dev/null 2>&1 && pkg-config --libs mariadb 2>/dev/null)
 endif
 
+ifeq ($(strip $(MYSQL_CFLAGS)),)
+MYSQL_CFLAGS := $(shell command -v pkg-config >/dev/null 2>&1 && pkg-config --cflags mariadbclient 2>/dev/null)
+MYSQL_LIBS := $(shell command -v pkg-config >/dev/null 2>&1 && pkg-config --libs mariadbclient 2>/dev/null)
+endif
+
 # 某些 Debian/Ubuntu 环境没有 config 脚本，但头文件和库已安装在系统默认路径
 ifeq ($(strip $(MYSQL_CFLAGS)),)
 ifneq ($(wildcard /usr/include/mysql/mysql.h),)
@@ -32,6 +37,9 @@ MYSQL_CFLAGS := -I/usr/include/mysql
 MYSQL_LIBS := -lmysqlclient
 else ifneq ($(wildcard /usr/include/mariadb/mysql.h),)
 MYSQL_CFLAGS := -I/usr/include/mariadb
+MYSQL_LIBS := -lmariadb
+else ifneq ($(wildcard /usr/include/mariadb/server/mysql.h),)
+MYSQL_CFLAGS := -I/usr/include/mariadb/server
 MYSQL_LIBS := -lmariadb
 endif
 endif

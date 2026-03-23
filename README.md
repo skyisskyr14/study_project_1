@@ -50,7 +50,8 @@
   2. `mariadb_config`
   3. `pkg-config libmysqlclient`
   4. `pkg-config mariadb`
-  5. 系统默认路径（如 `/usr/include/mysql` 或 `/usr/include/mariadb`）
+  5. `pkg-config mariadbclient`
+  6. 系统默认路径（如 `/usr/include/mysql`、`/usr/include/mariadb`、`/usr/include/mariadb/server`）
 
 ### 常见问题（已安装却仍显示 stub）
 ```bash
@@ -73,6 +74,7 @@ ls /usr/include/mariadb/mysql.h
 > 请务必先执行 `make clean` 再 `make`，并重启服务端，避免继续运行旧的 stub 版本。
 >
 > 新版服务端启动时会打印 `服务端数据库编译模式: REAL/STUB`，
+> 客户端连接后也会看到 `[SERVER] 数据库编译模式: REAL/STUB`，
 > 可直接确认当前运行的服务端是不是你刚编译出来的版本。
 
 更多细节见 `docs/` 目录。

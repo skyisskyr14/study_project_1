@@ -24,6 +24,11 @@ static void run_session_on_socket(int client_fd) {
 
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
+#ifdef MYSQL_STUB
+    printf("[SERVER] 数据库编译模式: STUB\n");
+#else
+    printf("[SERVER] 数据库编译模式: REAL\n");
+#endif
 
     run_app();
 }

@@ -13,6 +13,8 @@
 #    include <mysql/mysql.h>
 #  elif __has_include(<mariadb/mysql.h>)
 #    include <mariadb/mysql.h>
+#  elif __has_include(<mariadb/server/mysql.h>)
+#    include <mariadb/server/mysql.h>
 #  elif __has_include(<mysql.h>)
 #    include <mysql.h>
 #  else
