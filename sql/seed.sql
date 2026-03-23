@@ -1,12 +1,14 @@
 USE voting_system;
+SET NAMES utf8mb4;
 
--- 默认管理员，密码为 admin123（由当前代码的 hash_password 算法计算结果）
+-- 默认管理员，密码为 admin123（由当前代码的 make_password_hash 算法计算结果）
 INSERT INTO users(username, password_hash, user_type, has_voted)
 VALUES ('admin', '000000000000000000000000000000000000000000000000000006531ca97027', 'admin', 0)
 ON DUPLICATE KEY UPDATE username = VALUES(username);
 
+-- 为避免 Windows CMD / PowerShell 编码差异导致导入失败，示例数据使用 ASCII 文本
 INSERT INTO candidates(name, category, bio, vote_count)
 VALUES
-('张三', '学生代表', '关注教学质量与实验资源', 0),
-('李四', '学生代表', '关注社团与校园活动体验', 0)
-ON DUPLICATE KEY UPDATE name = VALUES(name);
+('Alice', 'StudentRep', 'Focus on teaching quality and lab resources.', 0),
+('Bob', 'StudentRep', 'Focus on clubs and campus activity experience.', 0)
+ON DUPLICATE KEY UPDATE name = VALUES(name), category = VALUES(category), bio = VALUES(bio);

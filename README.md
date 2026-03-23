@@ -9,8 +9,9 @@
 ## 快速开始
 1. 初始化数据库
    ```bash
-   mysql -u root -p < sql/schema.sql
-   mysql -u root -p < sql/seed.sql
+   # Windows 请先执行: chcp 65001
+   mysql -u root -p --default-character-set=utf8mb4 < sql/schema.sql
+   mysql -u root -p --default-character-set=utf8mb4 < sql/seed.sql
    ```
 2. 编译
    ```bash

@@ -1,15 +1,24 @@
 # 部署与运行说明
 
 ## 1. 环境要求
-- Linux / macOS
+- Linux / macOS / Windows
 - GCC (支持 C11)
 - MySQL Server 8+
 - MySQL C Client 开发库（`mysql_config` 可用）
 
 ## 2. 初始化数据库
+### Linux / macOS
 ```bash
-mysql -u root -p < sql/schema.sql
-mysql -u root -p < sql/seed.sql
+mysql -u root -p --default-character-set=utf8mb4 < sql/schema.sql
+mysql -u root -p --default-character-set=utf8mb4 < sql/seed.sql
+```
+
+### Windows CMD / PowerShell
+先切换终端编码到 UTF-8，再导入：
+```bat
+chcp 65001
+mysql -u root -p --default-character-set=utf8mb4 < sql/schema.sql
+mysql -u root -p --default-character-set=utf8mb4 < sql/seed.sql
 ```
 
 ## 3. 编译
