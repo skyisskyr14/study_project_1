@@ -51,8 +51,8 @@ void run_admin_menu(void *db_conn, const User *current_user) {
             case 1: candidate_add(conn, current_user->username); break;
             case 2: candidate_delete(conn, current_user->username); break;
             case 3: candidate_update(conn, current_user->username); break;
-            case 4: candidate_list(conn, "name"); break;
-            case 5: candidate_list(conn, "vote_count"); break;
+            case 4: candidate_list(conn, "name", NULL); break;
+            case 5: candidate_list(conn, "vote_count", NULL); break;
             case 6: config_set_voting_window(conn, current_user->username); break;
             case 7: vote_revoke(conn, current_user->username); break;
             case 8: user_list_all(conn); break;
@@ -89,8 +89,8 @@ void run_voter_menu(void *db_conn, const User *current_user) {
         if (!to_int(input, &choice)) continue;
 
         switch (choice) {
-            case 1: candidate_list(conn, "name"); break;
-            case 2: candidate_list(conn, "vote_count"); break;
+            case 1: candidate_list(conn, "name", NULL); break;
+            case 2: candidate_list(conn, "vote_count", NULL); break;
             case 3:
                 if (vote_cast(conn, &session_user)) {
                     session_user.has_voted = 1;

@@ -17,13 +17,62 @@
    ```bash
    make
    ```
-3. 运行
+3. 运行（单机终端版）
    ```bash
    ./voting_system
    ```
 
+## 服务端/客户端模式（完整终端流程）
+- 编译后会额外生成：
+  - `voting_server`：TCP 服务端（默认监听 `9090`，每个连接独立会话）
+  - `voting_client`：TCP 客户端（默认连接 `127.0.0.1:9090`）
+
+### 启动服务端
+```bash
+./voting_server
+```
+
+> 服务端会把原来的 `run_app()` 终端交互流程直接跑在客户端连接上，
+> 也就是：客户端连上后，看到的就是完整“注册/登录/投票/管理”菜单，而不是演示框架命令。
+
+### 连接服务端
+```bash
+# 本机
+./voting_client
+
+# 或指定服务端 IP
+./voting_client 192.168.1.100
+```
+
+### 使用说明
+- 客户端连接成功后直接按原系统菜单操作即可（输入数字、用户名、密码等）。
+- 退出方式与单机版一致：在菜单里选择 `0` 退出登录/退出系统。
+
 ## 编译模式说明
 - 检测到 MySQL 开发库（`mysql/mysql.h` + client lib）时：使用真实 MySQL 模式。
 - 未检测到时：自动回退到 stub 模式，程序可编译但会在启动时提示数据库不可用。
+- Makefile 会按以下顺序自动探测依赖：
+  1. `mysql_config`
+  2. `mariadb_config`
+  3. `pkg-config libmysqlclient`
+  4. `pkg-config mariadb`
+  5. 系统默认路径（如 `/usr/include/mysql` 或 `/usr/include/mariadb`）
+
+### 常见问题（已安装却仍显示 stub）
+```bash
+# 1) 看是否能找到探测工具
+which mysql_config
+which mariadb_config
+
+# 2) 看 pkg-config 是否有条目
+pkg-config --cflags libmysqlclient
+pkg-config --cflags mariadb
+
+# 3) 确认头文件存在
+ls /usr/include/mysql/mysql.h
+ls /usr/include/mariadb/mysql.h
+```
+
+若上述任一项可用，重新 `make clean && make` 后应进入真实数据库模式。
 
 更多细节见 `docs/` 目录。
