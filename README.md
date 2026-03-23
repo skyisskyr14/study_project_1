@@ -17,10 +17,34 @@
    ```bash
    make
    ```
-3. 运行
+3. 运行（单机终端版）
    ```bash
    ./voting_system
    ```
+
+## 服务端/客户端模式（基础框架）
+- 编译后会额外生成：
+  - `voting_server`：TCP 服务端（默认监听 `9090`）
+  - `voting_client`：TCP 客户端（默认连接 `127.0.0.1:9090`）
+
+### 启动服务端
+```bash
+./voting_server
+```
+
+### 连接服务端
+```bash
+# 本机
+./voting_client
+
+# 或指定服务端 IP
+./voting_client 192.168.1.100
+```
+
+### 当前支持命令
+- `HELP`
+- `PING`
+- `QUIT`
 
 ## 编译模式说明
 - 检测到 MySQL 开发库（`mysql/mysql.h` + client lib）时：使用真实 MySQL 模式。
