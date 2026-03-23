@@ -1,7 +1,12 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -Iinclude
-SRC = $(wildcard src/*.c)
+CORE_SRC = src/candidate.c src/common.c src/db.c src/log.c src/mysql_stub.c src/stats.c src/ui.c src/user.c src/vote.c
+APP_SRC = $(CORE_SRC) src/main.c
+SERVER_SRC = $(CORE_SRC) src/server.c
+CLIENT_SRC = src/client.c
 BIN = voting_system
+SERVER_BIN = voting_server
+CLIENT_BIN = voting_client
 
 # 先探测 mysql_config，再尝试 pkg-config；都失败则进入 stub 模式
 MYSQL_CFLAGS := $(shell command -v mysql_config >/dev/null 2>&1 && mysql_config --cflags)
@@ -16,12 +21,18 @@ ifeq ($(strip $(MYSQL_CFLAGS)),)
 CFLAGS += -DFORCE_MYSQL_STUB
 endif
 
-all: $(BIN)
+all: $(BIN) $(SERVER_BIN) $(CLIENT_BIN)
 
-$(BIN): $(SRC)
+$(BIN): $(APP_SRC)
 	$(CC) $(CFLAGS) $(MYSQL_CFLAGS) -o $@ $^ $(MYSQL_LIBS)
 
+$(SERVER_BIN): $(SERVER_SRC)
+	$(CC) $(CFLAGS) $(MYSQL_CFLAGS) -o $@ $^ $(MYSQL_LIBS)
+
+$(CLIENT_BIN): $(CLIENT_SRC)
+	$(CC) $(CFLAGS) -o $@ $^
+
 clean:
-	rm -f $(BIN)
+	rm -f $(BIN) $(SERVER_BIN) $(CLIENT_BIN)
 
 .PHONY: all clean
