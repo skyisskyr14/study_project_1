@@ -37,8 +37,7 @@ endif
 endif
 
 ifeq ($(strip $(MYSQL_CFLAGS)),)
-CFLAGS += -DFORCE_MYSQL_STUB
-$(info [build] MySQL 开发库未检测到，使用 stub 模式编译)
+$(info [build] 未找到 config/pkg-config，继续由源码头文件探测决定是否进入 stub 模式)
 else
 $(info [build] 使用真实 MySQL/MariaDB 库编译)
 endif

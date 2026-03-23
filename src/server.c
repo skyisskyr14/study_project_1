@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include "mysql_compat.h"
 #include "ui.h"
 
 #define SERVER_PORT 9090
@@ -57,6 +58,11 @@ int main(void) {
 
     signal(SIGPIPE, SIG_IGN);
     signal(SIGCHLD, SIG_IGN);
+#ifdef MYSQL_STUB
+    printf("服务端数据库编译模式: STUB\n");
+#else
+    printf("服务端数据库编译模式: REAL\n");
+#endif
     printf("投票服务端已启动: 0.0.0.0:%d\n", SERVER_PORT);
     fflush(stdout);
 

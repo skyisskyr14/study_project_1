@@ -71,5 +71,8 @@ ls /usr/include/mariadb/mysql.h
 
 > 注意：如果目录里已经有旧的 `voting_server` / `voting_client` 可执行文件，
 > 请务必先执行 `make clean` 再 `make`，并重启服务端，避免继续运行旧的 stub 版本。
+>
+> 新版服务端启动时会打印 `服务端数据库编译模式: REAL/STUB`，
+> 可直接确认当前运行的服务端是不是你刚编译出来的版本。
 
 更多细节见 `docs/` 目录。
