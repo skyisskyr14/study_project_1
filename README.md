@@ -51,5 +51,28 @@
 ## 编译模式说明
 - 检测到 MySQL 开发库（`mysql/mysql.h` + client lib）时：使用真实 MySQL 模式。
 - 未检测到时：自动回退到 stub 模式，程序可编译但会在启动时提示数据库不可用。
+- Makefile 会按以下顺序自动探测依赖：
+  1. `mysql_config`
+  2. `mariadb_config`
+  3. `pkg-config libmysqlclient`
+  4. `pkg-config mariadb`
+  5. 系统默认路径（如 `/usr/include/mysql` 或 `/usr/include/mariadb`）
+
+### 常见问题（已安装却仍显示 stub）
+```bash
+# 1) 看是否能找到探测工具
+which mysql_config
+which mariadb_config
+
+# 2) 看 pkg-config 是否有条目
+pkg-config --cflags libmysqlclient
+pkg-config --cflags mariadb
+
+# 3) 确认头文件存在
+ls /usr/include/mysql/mysql.h
+ls /usr/include/mariadb/mysql.h
+```
+
+若上述任一项可用，重新 `make clean && make` 后应进入真实数据库模式。
 
 更多细节见 `docs/` 目录。
