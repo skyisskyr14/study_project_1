@@ -9,8 +9,8 @@ MYSQL *db_connect(const DbConfig *cfg) {
     }
 
 #ifdef MYSQL_STUB
-    fprintf(stderr, "[DB] 当前为 MySQL stub 模式：未检测到 mysql/mysql.h 或客户端库。\n");
-    fprintf(stderr, "[DB] 请安装 MySQL 开发库后重新编译，或继续用于界面演示。\n");
+    fprintf(stderr, "[DB] 当前为 MySQL stub 模式：未检测到 MySQL/MariaDB 开发头文件或客户端库。\n");
+    fprintf(stderr, "[DB] 请安装开发库后重新编译；仅做界面演示时才使用 make ALLOW_STUB=1。\n");
     mysql_close(conn);
     return NULL;
 #endif
