@@ -14,6 +14,15 @@
 
 int main(int argc, char *argv[]) {
     const char *server_ip = (argc >= 2) ? argv[1] : "127.0.0.1";
+    unsigned int server_port = SERVER_PORT;
+    if (argc >= 3) {
+        unsigned long p = strtoul(argv[2], NULL, 10);
+        if (p == 0 || p > 65535) {
+            fprintf(stderr, "无效端口: %s\n", argv[2]);
+            return 1;
+        }
+        server_port = (unsigned int)p;
+    }
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         fprintf(stderr, "socket 创建失败: %s\n", strerror(errno));
@@ -23,7 +32,7 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(SERVER_PORT);
+    server_addr.sin_port = htons((unsigned short)server_port);
     if (inet_pton(AF_INET, server_ip, &server_addr.sin_addr) <= 0) {
         fprintf(stderr, "无效服务端 IP: %s\n", server_ip);
         close(sockfd);
@@ -36,7 +45,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    printf("已连接到服务端 %s:%d\n", server_ip, SERVER_PORT);
+    printf("已连接到服务端 %s:%u\n", server_ip, server_port);
     fflush(stdout);
 
     while (1) {

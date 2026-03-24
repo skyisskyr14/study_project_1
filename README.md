@@ -44,8 +44,11 @@ export VOTE_DB_PORT=3306
 # 本机
 ./voting_client
 
-# 或指定服务端 IP
+# 指定服务端 IP（端口默认 9090）
 ./voting_client 192.168.1.100
+
+# 指定服务端 IP + 端口
+./voting_client 192.168.1.100 10090
 ```
 
 ### 使用说明
