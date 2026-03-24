@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "ui.h"
 #include "db.h"
@@ -10,12 +11,39 @@
 #include "common.h"
 
 static DbConfig g_db = {
-    .host = "127.0.0.1",
+    .host = "localhost",
     .user = "root",
-    .password = "123456",
+    .password = "",
     .database = "voting_system",
     .port = 3306
 };
+
+static void load_db_config_from_env(void) {
+    const char *host = getenv("VOTE_DB_HOST");
+    const char *user = getenv("VOTE_DB_USER");
+    const char *password = getenv("VOTE_DB_PASSWORD");
+    const char *database = getenv("VOTE_DB_NAME");
+    const char *port = getenv("VOTE_DB_PORT");
+
+    if (host && host[0] != '\0') {
+        snprintf(g_db.host, sizeof(g_db.host), "%s", host);
+    }
+    if (user && user[0] != '\0') {
+        snprintf(g_db.user, sizeof(g_db.user), "%s", user);
+    }
+    if (password) {
+        snprintf(g_db.password, sizeof(g_db.password), "%s", password);
+    }
+    if (database && database[0] != '\0') {
+        snprintf(g_db.database, sizeof(g_db.database), "%s", database);
+    }
+    if (port && port[0] != '\0') {
+        unsigned long p = strtoul(port, NULL, 10);
+        if (p > 0 && p <= 65535) {
+            g_db.port = (unsigned int)p;
+        }
+    }
+}
 
 static void show_guest_menu(void) {
     printf("\n========== 投票系统 =========="
@@ -51,8 +79,8 @@ void run_admin_menu(void *db_conn, const User *current_user) {
             case 1: candidate_add(conn, current_user->username); break;
             case 2: candidate_delete(conn, current_user->username); break;
             case 3: candidate_update(conn, current_user->username); break;
-            case 4: candidate_list(conn, "name"); break;
-            case 5: candidate_list(conn, "vote_count"); break;
+            case 4: candidate_list(conn, "name", NULL); break;
+            case 5: candidate_list(conn, "vote_count", NULL); break;
             case 6: config_set_voting_window(conn, current_user->username); break;
             case 7: vote_revoke(conn, current_user->username); break;
             case 8: user_list_all(conn); break;
@@ -89,8 +117,8 @@ void run_voter_menu(void *db_conn, const User *current_user) {
         if (!to_int(input, &choice)) continue;
 
         switch (choice) {
-            case 1: candidate_list(conn, "name"); break;
-            case 2: candidate_list(conn, "vote_count"); break;
+            case 1: candidate_list(conn, "name", NULL); break;
+            case 2: candidate_list(conn, "vote_count", NULL); break;
             case 3:
                 if (vote_cast(conn, &session_user)) {
                     session_user.has_voted = 1;
@@ -105,9 +133,13 @@ void run_voter_menu(void *db_conn, const User *current_user) {
 }
 
 void run_app(void) {
+    load_db_config_from_env();
     MYSQL *conn = db_connect(&g_db);
     if (!conn) {
         printf("数据库连接失败，请检查配置与 MySQL 服务。\n");
+        printf("当前连接配置: host=%s user=%s db=%s port=%u\n",
+               g_db.host, g_db.user, g_db.database, g_db.port);
+        printf("可通过环境变量覆盖: VOTE_DB_HOST / VOTE_DB_USER / VOTE_DB_PASSWORD / VOTE_DB_NAME / VOTE_DB_PORT\n");
         return;
     }
 

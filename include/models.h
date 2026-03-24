@@ -37,6 +37,7 @@ typedef struct {
     int id;
     int user_id;
     int candidate_id;
+    char vote_category[CANDIDATE_CATEGORY_MAX_LEN];
     char ip_addr[IP_ADDR_MAX_LEN];
     char voted_at[20];
 } VoteRecord;

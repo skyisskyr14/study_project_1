@@ -24,10 +24,11 @@ CREATE TABLE IF NOT EXISTS vote_records (
     id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
     candidate_id INT NOT NULL,
+    vote_category VARCHAR(63) NOT NULL,
     ip_addr VARCHAR(45) NOT NULL,
     voted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uk_vote_user (user_id),
-    UNIQUE KEY uk_vote_ip (ip_addr),
+    UNIQUE KEY uk_vote_user_category (user_id, vote_category),
+    UNIQUE KEY uk_vote_ip_category (ip_addr, vote_category),
     CONSTRAINT fk_vote_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_vote_candidate FOREIGN KEY (candidate_id) REFERENCES candidates(id)
 );
