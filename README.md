@@ -26,6 +26,16 @@
 ./voting_server
 ```
 
+可选：通过环境变量覆盖数据库连接参数（强烈建议按你的本机环境配置）：
+```bash
+export VOTE_DB_HOST=localhost
+export VOTE_DB_USER=root
+export VOTE_DB_PASSWORD=''
+export VOTE_DB_NAME=voting_system
+export VOTE_DB_PORT=3306
+./voting_server
+```
+
 > 服务端会把原来的 `run_app()` 终端交互流程直接跑在客户端连接上，
 > 也就是：客户端连上后，看到的就是完整“注册/登录/投票/管理”菜单，而不是演示框架命令。
 
@@ -41,10 +51,12 @@
 ### 使用说明
 - 客户端连接成功后直接按原系统菜单操作即可（输入数字、用户名、密码等）。
 - 退出方式与单机版一致：在菜单里选择 `0` 退出登录/退出系统。
+- 若连接失败，服务端会输出当前实际使用的 `host/user/db/port`，用于快速核对配置。
 
 ## 编译模式说明
 - 检测到 MySQL/MariaDB 开发库（如 `mysql/mysql.h`、`mariadb/mysql.h` 或 `mysql.h` + client lib）时：使用真实 MySQL 模式。
-- 未检测到时：自动回退到 stub 模式，程序可编译但会在启动时提示数据库不可用。
+- 默认不再自动回退到 stub：若未检测到开发库，`make` 会直接报错并提示安装依赖。
+- 若你只想本地演示界面，可显式执行：`make ALLOW_STUB=1`。
 - Makefile 会按以下顺序自动探测依赖：
   1. `mysql_config`
   2. `mariadb_config`

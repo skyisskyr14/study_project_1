@@ -45,7 +45,12 @@ endif
 endif
 
 ifeq ($(strip $(MYSQL_CFLAGS)),)
-$(info [build] 未找到 config/pkg-config，继续由源码头文件探测决定是否进入 stub 模式)
+ifeq ($(ALLOW_STUB),1)
+CFLAGS += -DFORCE_MYSQL_STUB
+$(info [build] 未检测到 MySQL/MariaDB 开发库，按 ALLOW_STUB=1 使用 stub 模式编译)
+else
+$(error 未检测到 MySQL/MariaDB 开发库，请安装 libmariadb-dev 或 libmysqlclient-dev；若只做演示可使用 make ALLOW_STUB=1)
+endif
 else
 $(info [build] 使用真实 MySQL/MariaDB 库编译)
 endif
